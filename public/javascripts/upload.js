@@ -1,3 +1,8 @@
+var height = window.innerHeight;
+var width = window.innerWidth;
+$('#mapid').height = height * 0.5;
+$('#mapid').width = width * 0.5;
+
 $('.upload-btn').on('click', function (){
     $('#upload-input').click();
     $('.progress-bar').text('0%');

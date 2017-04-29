@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>File Uploader - coligo.io</title>
+  <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <link href="css/styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="javascripts/upload.js"></script>
+  <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css">
+
+
+  <!--
+  <style>
+    #mapid { height: 300px; width: 400px }
+  </style>
+-->
+<!--
+  <script>
+    var height = window.innerHeight;
+    var width = window.innerWidth;
+    document.getElementById('mapid').style.cssText = "height: " + height * 0.5 + "; width: " + width * 0.5 + ";";
+  </script>    putting this here doesn't work
+-->
+</head>
+<body>
+  <!--
+  <script>
+    var height = window.innerHeight;
+    var width = window.innerWidth;
+    document.getElementById('mapid').style.cssText = "height: " + height * 0.5 + "; width: " + width * 0.5 + ";";
+  </script>    putting this here doesn't work
+-->
+  <div>
+    <div id="mapid" class="map"></div>
+  </div>
+    <!--
+  <script>
+    var height = window.innerHeight;
+    var width = window.innerWidth;
+    document.getElementById('mapid').style.cssText = "height: " + height * 0.5 + "; width: " + width * 0.5 + ";";
+  </script>    putting this here doesn't work
+-->
+  <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+  <script>
+  // 設定經緯度座標
+  var lat_now = 25.021918;
+  var lng_now = 121.535285;
+
+  //初始化
+  var int = L.latLng(lat_now, lng_now);
+  var map = L.map('mapid');
+  map.setView(int, 15);
+  var locate = L.marker(int).addTo(map);
+  locate.bindPopup("You are here.").openPopup();
+  var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  var osm = new L.TileLayer(osmUrl, {minZoom: 1, maxZoom: 16});
+  map.addLayer(osm);
+
+//  var polyline = L.polyline(int, {color: 'red'}).addTo(map);
+//  map.fitBounds(polyline.getBounds());
+
+
+  //框多邊形
+  var fla = 1
+  var xlatlng = new Array(1)
+  var xmarker = new Array(1)
+  var centerlat
+  var centerlng
+  var radius
+  var polyline
+  var polygon
+  var circle
+  function onMapClick(e) {
+    if (fla == 0){
+      fla = 1
+      map.removeLayer(polygon)
+      map.removeLayer(circle)
+      xlatlng.length = 0
+      xmarker.length = 0
+      xlatlng.splice(0 ,0 ,null);
+      xmarker.splice(0 ,0 ,null);
+    }
+    if (xlatlng[0] == null)
+    {
+      xlatlng[0] = e.latlng
+      xmarker[0] = L.marker(xlatlng[0]).addTo(map)
+    }
+    else if (xlatlng.length == 1)
+    {
+      xlatlng.splice(xlatlng.length ,0 ,e.latlng);
+      xmarker.splice(xmarker.length ,0 ,L.marker(xlatlng[1]).addTo(map));
+      polyline = L.polyline(xlatlng, {color: 'blue'}).addTo(map);
+    }
+    else
+    {
+      if(e.latlng.distanceTo(xlatlng[0])<100*Math.pow(2,15-map.getZoom())){
+        //find convex hull
+        var pos = new Array(xlatlng.length)
+        var need = new Array(xlatlng.length)
+        var n
+        for (var i = 0;i < xlatlng.length;++i)
+        {
+          pos[i] = new Array(2)
+          pos[i][0] = xlatlng[i].lat
+          pos[i][1] = xlatlng[i].lng
+          need[i] = new Array(2)
+        }
+        pos.sort()
+        var index = 0
+        for (var i = 0;i < xlatlng.length;++i){
+          while(index>=2 && (need[index-1][0] - pos[i][0])*(need[index-1][1] - need[index-2][1])-(need[index-1][1] - pos[i][1])*(need[index-1][0] - need[index-2][0]) <= 0) index--
+          need[index++] = pos[i];
+        }
+        var half_point = index+1
+        for(var i = xlatlng.length - 2;i >=0;--i){
+          while(index >= half_point && (need[index-1][0] - pos[i][0])*(need[index-1][1] - need[index-2][1])-(need[index-1][1] - pos[i][1])*(need[index-1][0] - need[index-2][0]) <= 0) index--
+          need[index++] = pos[i]
+        }
+        var n = index;
+        xlatlng.length = 0
+        xlatlng.splice(0 ,0 ,null);
+        xlatlng[0] = L.latLng(need[0][0],need[0][1])
+        for(var i = 1;i < n - 1; ++i){
+          xlatlng.splice(xlatlng.length ,0 ,L.latLng(need[i][0],need[i][1]));
+        }
+        //find center
+        var tricenterlat = new Array(xlatlng.length - 2)
+        var tricenterlng = new Array(xlatlng.length - 2)
+        var triarea = new Array(xlatlng.length - 2)
+        for (var i = 0; i < xlatlng.length - 2; i++) {
+          tricenterlat[i] = (xlatlng[xlatlng.length - 1].lat + xlatlng[i].lat + xlatlng[i + 1].lat) / 3
+          tricenterlng[i] = (xlatlng[xlatlng.length - 1].lng + xlatlng[i].lng + xlatlng[i + 1].lng) / 3
+          var s = (xlatlng[xlatlng.length - 1].distanceTo(xlatlng[i]) + xlatlng[xlatlng.length - 1].distanceTo(xlatlng[i + 1]) + xlatlng[i].distanceTo(xlatlng[i + 1])) / 2
+          triarea[i] = Math.sqrt(s * (s-xlatlng[xlatlng.length - 1].distanceTo(xlatlng[i]))*(s-xlatlng[xlatlng.length - 1].distanceTo(xlatlng[i+1]))*(s-xlatlng[i].distanceTo(xlatlng[i+1])))
+        }
+        var sumarea = 0.0
+        centerlat = 0.0
+        centerlng = 0.0
+        for (var i = 0; i < xlatlng.length - 2; i++) {
+          centerlat += tricenterlat[i] * triarea[i]
+          centerlng += tricenterlng[i] * triarea[i]
+          sumarea += triarea[i]
+        }
+        centerlat = centerlat / sumarea
+        centerlng = centerlng / sumarea
+        radius = Math.sqrt(sumarea/3.14159)
+        /*radius = 0
+        for (var i = 0; i < xlatlng.length; i++) {
+          if (radius < xlatlng[i].distanceTo([centerlat,centerlng]))
+          {
+            radius = xlatlng[i].distanceTo([centerlat,centerlng])
+          }
+        }*/
+        //
+        circle = L.circle([centerlat, centerlng], radius, {color: 'red', fillColor: '#f03', fillOpacity: 0.5}).addTo(map);
+        map.removeLayer(polyline)
+        polygon = L.polygon(xlatlng).addTo(map)
+        for (var i = 0; i < xmarker.length; i++) {
+          map.removeLayer(xmarker[i])
+        }
+        fla = 0
+      }
+      else{
+        xlatlng.splice(xlatlng.length ,0 ,e.latlng);
+        xmarker.splice(xmarker.length ,0 ,L.marker(xlatlng[xlatlng.length-1]).addTo(map));
+        map.removeLayer(polyline)
+        polyline = L.polyline(xlatlng, {color: 'blue'}).addTo(map);
+      }
+    }
+
+  }
+  map.on('click', onMapClick);
+  function calculate(){
+      posdata.centerlat.value = centerlat
+      posdata.centerlng.value = centerlng
+  }
+</script>
+  <form action="/upload" enctype="multipart/form-data" method="post" id="posdata">
+    <ul class="form-style-1">
+        <li>
+          <span class="calculate" onclick="calculate()">Calculate position</span><br><br>
+          <div>
+            <label>Latitude <span class="required">*</span><label>
+            <input type='text' name='latitude' id='centerlat'>
+          </div>
+          <div>
+            <label>Longitude <span class="required">*</span><label>
+            <input type='text' name='longitude' id='centerlng'>
+          </div>
+        </li>
+        <li>
+            <label>Country <span class="required">*</span></label>
+            <input type="text" name="country" class="field-long" />
+        </li>
+        <li>
+            <label>Date<span class="required">*</span></label>
+            <input type="text" id="datepicker" name="date" class="field-long" />
+        </li>
+        <li>
+            <label>Injuries<span class="required">*</span></label>
+            <input type="text" name="injuries" class="field-long" />
+        </li>
+        <li>
+          <label>
+            Photo
+          </label>
+          <input type="file" name="upload" multiple="multiple">
+        </li>
+        <li>
+            <input type="submit" value="Upload information" />
+        </li>
+    </ul>
+  </form>
+
+</body>
+</html>
