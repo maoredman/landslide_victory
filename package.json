@@ -1,7 +1,7 @@
 {
-  "name": "landslide_victory",
+  "name": "landslide_input",
   "version": "1.0.0",
-  "description": "AJAX file uploader using JS and NodeJS, plus added React components",
+  "description": "AJAX file uploader using JS and NodeJS",
   "directories": {
     "lib": "./lib"
   },

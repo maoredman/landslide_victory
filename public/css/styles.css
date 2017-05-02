@@ -1,3 +1,7 @@
+h1 {
+  text-align: center;
+}
+
 .map{
   margin: 10px auto;
 }
@@ -24,15 +28,29 @@
 
 .form-style-1 {
     margin:10px auto;
-    max-width: 400px;
+    max-width: 500px;
     padding: 20px 12px 10px 20px;
-    font: 13px "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    font: 13px 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
+
+.floatleft {
+  float: left;
+  margin-top: 10px;
+  margin-right: 10px;
+}
+
+.floatleftandmoremargin {
+  float: left;
+  margin-left: 20px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
 .form-style-1 li {
     padding: 0;
     display: block;
     list-style: none;
-    margin: 10px 0 0 0;
+    margin: 0px 0 0 0;
 }
 .form-style-1 label{
     margin:0 0 3px 0;
@@ -118,11 +136,11 @@ select{
 html,
 body {
   height: 100%;
-  background-color: #4791D2;
+  background-color: #CCE7FB;
 }
 
 body {
-  font-family: 'Raleway', sans-serif;
+  font: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 .row {

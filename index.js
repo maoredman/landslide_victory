@@ -34,8 +34,11 @@ app.post('/upload', function(req, res){
 
   form.on('file', function(field, file) {
     // var fileName = (file.name) ? file.name : '';
-    fs.rename(file.path, path.join(form.uploadDir, file.name));
-    files.push([field, file]);
+    //console.log(file);
+    if (file.name) {
+      fs.rename(file.path, path.join(form.uploadDir, file.name));
+      files.push([field, file]);
+    }
   });
 
   // log any errors that occur
@@ -54,6 +57,10 @@ app.post('/upload', function(req, res){
     */
 
     var fieldList = fields;
+    var file_link = '';
+    if (files.length !== 0) {
+      file_link = files[0][1].name;
+    }
 
     console.log("FIELDLIST: "+ fieldList);
     console.log("fieldList[0][1]: "+ fieldList[0][1]);
@@ -61,11 +68,10 @@ app.post('/upload', function(req, res){
     console.log("fieldList[2][1]: "+ fieldList[2][1]);
     console.log("fieldList[3][1]: "+ fieldList[3][1]);
     console.log("fieldList[4][1]: "+ fieldList[4][1]);
-    console.log("PHOTOS_LINK: "+files[0][1].name);
+    console.log("PHOTOS_LINK: " + file_link);
 
 
     // ME: POST data to db
-
     var options = {
     method: 'post',
     body: {
@@ -74,7 +80,7 @@ app.post('/upload', function(req, res){
       country: fieldList[2][1],
       date: fieldList[3][1],
       injuries: fieldList[4][1],
-      photos_link: files[0][1].name
+      photos_link: file_link,
     },
     json: true,
     url: 'http://nasa.rails.nctu.me/catalogs/create',

@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>File Uploader - coligo.io</title>
+  <title>Upload - Landslide Victory</title>
   <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <link href="css/styles.css" rel="stylesheet">
@@ -39,6 +39,7 @@
     document.getElementById('mapid').style.cssText = "height: " + height * 0.5 + "; width: " + width * 0.5 + ";";
   </script>    putting this here doesn't work
 -->
+  <h1>Upload landslide data</h1>
   <div>
     <div id="mapid" class="map"></div>
   </div>
@@ -187,36 +188,40 @@
   <form action="/upload" enctype="multipart/form-data" method="post" id="posdata">
     <ul class="form-style-1">
         <li>
-          <span class="calculate" onclick="calculate()">Calculate position</span><br><br>
-          <div>
-            <label>Latitude <span class="required">*</span><label>
-            <input type='text' name='latitude' id='centerlat'>
+          <span class="calculate" onclick="calculate()">Click on the map to enclose an area, then click here</span><br><br>
+          <div class="floatleft">
+            <label for='centerlat'>Latitude <span class="required">*</span></label>
+            <input type='text' size='8' name='latitude' id='centerlat'>
           </div>
-          <div>
-            <label>Longitude <span class="required">*</span><label>
-            <input type='text' name='longitude' id='centerlng'>
+          <div class="floatleft">
+            <label for='centerlng'>Longitude <span class="required">*</span></label>
+            <input type='text' size='8' name='longitude' id='centerlng'>
+          </div>
+          <div class="floatleft">
+            <label for='countryID'>Country <span class="required">*</span></label>
+            <input type="text" size='18' name="country" id='countryID'>
           </div>
         </li>
-        <li>
-            <label>Country <span class="required">*</span></label>
-            <input type="text" name="country" class="field-long" />
+        <li style="clear: left">
+            <div class="floatleft">
+              <label for="datepicker">Date (YYYY-MM-DD)<span class="required">*</span></label>
+              <input type="text" size="10" id="datepicker" name="date"/>
+            </div>
+            <div class="floatleftandmoremargin">
+              <label for="myfile">Photo</label>
+              <input type="file" name="upload" multiple="multiple" id="myfile">
+            </div>
         </li>
-        <li>
-            <label>Date<span class="required">*</span></label>
-            <input type="text" id="datepicker" name="date" class="field-long" />
+        <li style="clear: left">
+          <div class="floatleft">
+            <label for="myinjuries">Injuries<span class="required">*</span></label>
+            <input type="text" name="injuries" class="field-long" id="myinjuries" />
+          </div>
         </li>
-        <li>
-            <label>Injuries<span class="required">*</span></label>
-            <input type="text" name="injuries" class="field-long" />
-        </li>
-        <li>
-          <label>
-            Photo
-          </label>
-          <input type="file" name="upload" multiple="multiple">
-        </li>
-        <li>
+        <li style="clear: left;">
+          <div class="floatleft" style="margin-bottom: 20px;">
             <input type="submit" value="Upload information" />
+          </div>
         </li>
     </ul>
   </form>
