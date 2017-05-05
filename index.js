@@ -47,20 +47,16 @@ app.post('/upload', function(req, res){
   });
 
   // once all the files have been uploaded, send a response to the client
+
+  isPerson = false;
   form.on('end', function() {
-
-    /*
-    res.writeHead(200, {'content-type': 'text/plain'});
-    res.write('received fields:\n\n '+util.inspect(fields));
-    res.write('\n\n');
-    res.end('received files:\n\n '+util.inspect(files));
-    */
-
     var fieldList = fields;
     var file_link = '';
     if (files.length !== 0) {
       file_link = files[0][1].name;
     }
+
+    // console.log("FIELDLIST IS: " + fieldList);
 
     console.log("FIELDLIST: "+ fieldList);
     console.log("fieldList[0][1]: "+ fieldList[0][1]);
@@ -69,6 +65,7 @@ app.post('/upload', function(req, res){
     console.log("fieldList[3][1]: "+ fieldList[3][1]);
     console.log("fieldList[4][1]: "+ fieldList[4][1]);
     console.log("PHOTOS_LINK: " + file_link);
+    console.log("captcha response: " + fieldList[5][1]);
 
 
     // ME: POST data to db
@@ -81,9 +78,10 @@ app.post('/upload', function(req, res){
       date: fieldList[3][1],
       injuries: fieldList[4][1],
       photos_link: file_link,
+      response: fieldList[5][1],
     },
     json: true,
-    url: 'http://nasa.rails.nctu.me/catalogs/create',
+    url: 'https://nasa.rails.nctu.me/catalogs/create',
     headers: {
       'Content-Type': 'application/json'
     }
@@ -95,21 +93,28 @@ app.post('/upload', function(req, res){
       console.error('error posting json: ', err)
       throw err
     }
-    var headers = res.headers
-    var statusCode = res.statusCode
-    console.log('headers: ', headers)
-    console.log('statusCode: ', statusCode)
-    console.log('body: ', body)
+    var headers = res.headers;
+    var statusCode = res.statusCode;
+    console.log('headers: ', headers);
+    console.log('statusCode: ', statusCode);
+    console.log('body: ', body);
+    isPerson = body.success;
   })
   console.log("finished POST");
   });
+  
   console.log("finished end");
 
   // parse the incoming request containing the form data
   form.parse(req, () => {
     console.log("finished parse");
     // ME: redirect
-    res.redirect('http://example.com');
+    if (isPerson) {
+      // TODO
+      res.redirect("http://example.com");
+    } else {
+      res.send('<script>alert("Upload failed, are you a robot?")</script>');
+    }
   });
 
 });
