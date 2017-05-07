@@ -4,7 +4,7 @@ var util = require('util');
 var path = require('path');
 var formidable = require('formidable');
 var fs = require('fs');
-var request = require('request');
+var request = require('request-promise');
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -99,7 +99,15 @@ app.post('/upload', function(req, res){
     console.log('statusCode: ', statusCode);
     console.log('body: ', body);
     isPerson = body.success;
-  })
+  }).then(function(){
+    // ME: redirect
+    if (isPerson) {
+      // TODO
+      res.redirect("http://example.com");
+    } else {
+      res.send('<script>alert("Upload failed, are you a robot?"); window.location.href="/";</script>');
+    }
+  });
   console.log("finished POST");
   });
   
@@ -108,13 +116,6 @@ app.post('/upload', function(req, res){
   // parse the incoming request containing the form data
   form.parse(req, () => {
     console.log("finished parse");
-    // ME: redirect
-    if (isPerson) {
-      // TODO
-      res.redirect("http://example.com");
-    } else {
-      res.send('<script>alert("Upload failed, are you a robot?")</script>');
-    }
   });
 
 });
